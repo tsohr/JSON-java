@@ -19,7 +19,9 @@
 	</developers>
 
 	<scm>
-		<url>https://github.com/tsohr/JSON-java.git</url>
+		<connection>scm:git:https://github.com/tsohr/JSON-java.git</connection>
+  		<developerConnection>scm:git:https://github.com/tsohr/JSON-java.git</developerConnection>
+  		<url>https://github.com/tsohr/JSON-java</url>
 	</scm>
 
 	<licenses>
