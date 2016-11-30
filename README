@@ -4,7 +4,15 @@ HashMap ==> LinkedHashMap.
 I know the json spec said it's unordered key-value pairs, but for a human reader
 for the output json code, we definitely need ordering. 
 
- 
+
+Maven dependency registered:
+
+`<dependency>
+  <groupId>com.github.tsohr</groupId>
+  <artifactId>json</artifactId>
+  <version>0.0.1</version>
+</dependency>
+` 
 
 
 =======================================================
