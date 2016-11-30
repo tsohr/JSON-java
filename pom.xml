@@ -4,8 +4,7 @@
 	<groupId>com.github.tsohr</groupId>
 	<artifactId>json</artifactId>
 	<version>0.0.1</version>
-	<packaging>jar</packaging>
-
+	
 	<name>json-ordered</name>
 	<description>Ordered version of JSONObject</description>
 	<url>https://github.com/tsohr/JSON-java</url>

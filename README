@@ -1,3 +1,16 @@
+
+HashMap ==> LinkedHashMap. 
+
+I know the json spec said it's unordered key-value pairs, but for a human reader
+for the output json code, we definitely need ordering. 
+
+ 
+
+
+=======================================================
+
+
+
 JSON in Java [package org.json]
 
 JSON is a light-weight, language independent, data interchange format.
