@@ -9,6 +9,15 @@
 	<description>Ordered version of JSONObject</description>
 	<url>https://github.com/tsohr/JSON-java</url>
 
+	<developers>
+		<developer>
+			<name>Younghwan Kim</name>
+			<email>sohrkim@gmail.com</email>
+			<organization>Github</organization>
+			<organizationUrl>https://github.com/tsohr</organizationUrl>
+		</developer>
+	</developers>
+
 	<scm>
 		<url>https://github.com/tsohr/JSON-java.git</url>
 	</scm>
