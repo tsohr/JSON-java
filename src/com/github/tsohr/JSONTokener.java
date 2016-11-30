@@ -1,4 +1,4 @@
-package org.json;
+package com.github.tsohr;
 
 import java.io.BufferedReader;
 import java.io.IOException;

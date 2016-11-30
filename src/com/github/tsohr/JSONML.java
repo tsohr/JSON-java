@@ -1,4 +1,4 @@
-package org.json;
+package com.github.tsohr;
 
 /*
 Copyright (c) 2008 JSON.org

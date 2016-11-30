@@ -1,4 +1,4 @@
-package org.json;
+package com.github.tsohr;
 
 /*
 Copyright (c) 2015 JSON.org
@@ -75,25 +75,26 @@ public class XML {
      */
     private static Iterable<Integer> codePointIterator(final String string) {
         return new Iterable<Integer>() {
-            @Override
+            
+            // from interface
             public Iterator<Integer> iterator() {
                 return new Iterator<Integer>() {
                     private int nextIndex = 0;
                     private int length = string.length();
 
-                    @Override
+                    // from interface
                     public boolean hasNext() {
                         return this.nextIndex < this.length;
                     }
 
-                    @Override
+                    // from interface
                     public Integer next() {
                         int result = string.codePointAt(this.nextIndex);
                         this.nextIndex += Character.charCount(result);
                         return result;
                     }
 
-                    @Override
+                    // from interface
                     public void remove() {
                         throw new UnsupportedOperationException();
                     }

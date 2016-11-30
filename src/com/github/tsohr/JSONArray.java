@@ -1,4 +1,4 @@
-package org.json;
+package com.github.tsohr;
 
 /*
  Copyright (c) 2002 JSON.org
@@ -181,7 +181,7 @@ public class JSONArray implements Iterable<Object> {
         }
     }
 
-    @Override
+    // from interface
     public Iterator<Object> iterator() {
         return myArrayList.iterator();
     }

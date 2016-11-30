@@ -1,4 +1,4 @@
-package org.json;
+package com.github.tsohr;
 
 import static java.lang.String.format;
 
