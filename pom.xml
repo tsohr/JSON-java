@@ -4,7 +4,7 @@
 	<groupId>com.github.tsohr</groupId>
 	<artifactId>json</artifactId>
 	<version>0.0.1</version>
-	
+
 	<name>json-ordered</name>
 	<description>Ordered version of JSONObject</description>
 	<url>https://github.com/tsohr/JSON-java</url>
@@ -132,16 +132,16 @@
 					</execution>
 				</executions>
 			</plugin>
-                        <plugin>
-                                <groupId>org.sonatype.plugins</groupId>
-                                <artifactId>nexus-staging-maven-plugin</artifactId>
-                                <extensions>true</extensions>
-                                <configuration>
-                                        <serverId>ossrh</serverId>
-                                        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                                        <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                                </configuration>
-                        </plugin>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
 
 		</plugins>
 	</build>
