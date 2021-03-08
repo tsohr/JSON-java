@@ -22,7 +22,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
 
 /**
  * This provides static methods to convert comma delimited text into a
@@ -55,7 +55,7 @@ public class CDL {
     private static String getValue(JSONTokener x) throws JSONException {
         char c;
         char q;
-        StringBuffer sb;
+        StringBuilder sb;
         do {
             c = x.next();
         } while (c == ' ' || c == '\t');
@@ -65,14 +65,17 @@ public class CDL {
         case '"':
         case '\'':
             q = c;
-            sb = new StringBuffer();
+            sb = new StringBuilder();
             for (;;) {
                 c = x.next();
                 if (c == q) {
                     //Handle escaped double-quote
-                    if(x.next() != '\"')
-                    {
-                        x.back();
+                    char nextC = x.next();
+                    if(nextC != '\"') {
+                        // if our quote was the end of the file, don't step
+                        if(nextC > 0) {
+                            x.back();
+                        }
                         break;
                     }
                 }
@@ -95,7 +98,7 @@ public class CDL {
      * Produce a JSONArray of strings from a row of comma delimited values.
      * @param x A JSONTokener of the source text.
      * @return A JSONArray of strings.
-     * @throws JSONException
+     * @throws JSONException if a called function fails
      */
     public static JSONArray rowToJSONArray(JSONTokener x) throws JSONException {
         JSONArray ja = new JSONArray();
@@ -131,7 +134,7 @@ public class CDL {
      *  method.
      * @param x A JSONTokener of the source text.
      * @return A JSONObject combining the names and values.
-     * @throws JSONException
+     * @throws JSONException if a called function fails
      */
     public static JSONObject rowToJSONObject(JSONArray names, JSONTokener x)
             throws JSONException {
@@ -181,7 +184,7 @@ public class CDL {
      * using the first row as a source of names.
      * @param string The comma delimited text.
      * @return A JSONArray of JSONObjects.
-     * @throws JSONException
+     * @throws JSONException if a called function fails
      */
     public static JSONArray toJSONArray(String string) throws JSONException {
         return toJSONArray(new JSONTokener(string));
@@ -192,7 +195,7 @@ public class CDL {
      * using the first row as a source of names.
      * @param x The JSONTokener containing the comma delimited text.
      * @return A JSONArray of JSONObjects.
-     * @throws JSONException
+     * @throws JSONException if a called function fails
      */
     public static JSONArray toJSONArray(JSONTokener x) throws JSONException {
         return toJSONArray(rowToJSONArray(x), x);
@@ -204,7 +207,7 @@ public class CDL {
      * @param names A JSONArray of strings.
      * @param string The comma delimited text.
      * @return A JSONArray of JSONObjects.
-     * @throws JSONException
+     * @throws JSONException if a called function fails
      */
     public static JSONArray toJSONArray(JSONArray names, String string)
             throws JSONException {
@@ -217,7 +220,7 @@ public class CDL {
      * @param names A JSONArray of strings.
      * @param x A JSONTokener of the source text.
      * @return A JSONArray of JSONObjects.
-     * @throws JSONException
+     * @throws JSONException if a called function fails
      */
     public static JSONArray toJSONArray(JSONArray names, JSONTokener x)
             throws JSONException {
@@ -245,7 +248,7 @@ public class CDL {
      * JSONObject.
      * @param ja A JSONArray of JSONObjects.
      * @return A comma delimited text.
-     * @throws JSONException
+     * @throws JSONException if a called function fails
      */
     public static String toString(JSONArray ja) throws JSONException {
         JSONObject jo = ja.optJSONObject(0);
@@ -265,14 +268,14 @@ public class CDL {
      * @param names A JSONArray of strings.
      * @param ja A JSONArray of JSONObjects.
      * @return A comma delimited text.
-     * @throws JSONException
+     * @throws JSONException if a called function fails
      */
     public static String toString(JSONArray names, JSONArray ja)
             throws JSONException {
         if (names == null || names.length() == 0) {
             return null;
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < ja.length(); i += 1) {
             JSONObject jo = ja.optJSONObject(i);
             if (jo != null) {
