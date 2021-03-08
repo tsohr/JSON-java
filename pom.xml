@@ -78,6 +78,16 @@
   <build>
     <sourceDirectory>src/</sourceDirectory>
     <testSourceDirectory>test/</testSourceDirectory>
+    <testResources>
+      <testResource>
+        <directory>test/resources/</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+        <filtering>false</filtering>
+      </testResource>
+    </testResources>
+    
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
