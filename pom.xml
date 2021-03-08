@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.tsohr</groupId>
   <artifactId>json</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
   <name>json-ordered</name>
   <description>Ordered version of JSONObject</description>
   <url>https://github.com/tsohr/JSON-java</url>
@@ -144,6 +144,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.6</version>
         <executions>
           <execution>
             <id>sign-artifacts</id>

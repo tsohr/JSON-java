@@ -12,7 +12,8 @@ Maven dependency registered:
 </dependency>
 ```
 
-
+ * Minimum Java version set to 1.8
+ 
 
 
 JSON in Java [package org.json]
