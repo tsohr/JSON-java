@@ -44,12 +44,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+
+import org.junit.Test;
 
 import com.github.tsohr.CDL;
 import com.github.tsohr.JSONArray;
@@ -76,8 +78,6 @@ import com.github.tsohr.junit.data.MyPublicClass;
 import com.github.tsohr.junit.data.Singleton;
 import com.github.tsohr.junit.data.SingletonEnum;
 import com.github.tsohr.junit.data.WeirdList;
-import org.junit.Test;
-
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 
@@ -298,7 +298,7 @@ public class JSONObjectTest {
      */
     @Test
     public void jsonObjectByMap() {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
         map.put("trueKey", new Boolean(true));
         map.put("falseKey", new Boolean(false));
         map.put("stringKey", "hello world!");
@@ -527,7 +527,7 @@ public class JSONObjectTest {
      */
     @Test
     public void jsonObjectByMapWithUnsupportedValues() {
-        Map<String, Object> jsonMap = new HashMap<String, Object>();
+        Map<String, Object> jsonMap = new LinkedHashMap<String, Object>();
         // Just insert some random objects
         jsonMap.put("key1", new CDL());
         jsonMap.put("key2", new Exception());
@@ -547,7 +547,7 @@ public class JSONObjectTest {
      */
     @Test
     public void jsonObjectByMapWithNullValue() {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
         map.put("trueKey", new Boolean(true));
         map.put("falseKey", new Boolean(false));
         map.put("stringKey", "hello world!");
@@ -1329,7 +1329,7 @@ public class JSONObjectTest {
          * wrap() vs put() big number behavior is now the same.
          */
         // bigInt map ctor 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
         map.put("bigInt", bigInteger);
         jsonObject = new JSONObject(map);
         String actualFromMapStr = jsonObject.toString();
@@ -1344,7 +1344,7 @@ public class JSONObjectTest {
                 actualFromPutStr.equals(
                 "{\"bigInt\":123456789012345678901234567890}"));
         // bigDec map ctor
-        map = new HashMap<String, Object>();
+        map = new LinkedHashMap<String, Object>();
         map.put("bigDec", bigDecimal);
         jsonObject = new JSONObject(map);
         actualFromMapStr = jsonObject.toString();
@@ -1717,7 +1717,7 @@ public class JSONObjectTest {
         jsonObject.put("falseKey", false);
         Integer [] intArray = { 0, 1, 2 };
         jsonObject.put("arrayKey", Arrays.asList(intArray));
-        Map<String, Object> myMap = new HashMap<String, Object>();
+        Map<String, Object> myMap = new LinkedHashMap<String, Object>();
         myMap.put("myKey1", "myVal1");
         myMap.put("myKey2", "myVal2");
         myMap.put("myKey3", "myVal3");
@@ -1886,7 +1886,7 @@ public class JSONObjectTest {
     @Test
     public void jsonObjectToStringSuppressWarningOnCastToMap() {
         JSONObject jsonObject = new JSONObject();
-        Map<String, String> map = new HashMap();
+        Map<String, String> map = new LinkedHashMap();
         map.put("abc", "def");
         jsonObject.put("key", map);
 
@@ -1948,7 +1948,7 @@ public class JSONObjectTest {
         JSONArray jsonArray = new JSONArray(jsonArrayStr);
         assertTrue("jsonArray valueToString() incorrect",
                 JSONObject.valueToString(jsonArray).equals(jsonArray.toString()));
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("key1", "val1");
         map.put("key2", "val2");
         map.put("key3", "val3");
@@ -1975,7 +1975,7 @@ public class JSONObjectTest {
     @SuppressWarnings("boxing")
     @Test
     public void valueToStringConfirmException() {
-        Map<Integer, String> myMap = new HashMap<Integer, String>();
+        Map<Integer, String> myMap = new LinkedHashMap<Integer, String>();
         myMap.put(1,  "myValue");
         // this is the test, it should not throw an exception
         String str = JSONObject.valueToString(myMap);
@@ -2056,7 +2056,7 @@ public class JSONObjectTest {
         assertTrue("expected 3", Integer.valueOf(3).equals(jsonArray.query("/2")));
 
         // wrap map returns JSONObject
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("key1", "val1");
         map.put("key2", "val2");
         map.put("key3", "val3");

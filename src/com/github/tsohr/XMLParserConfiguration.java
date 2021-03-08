@@ -24,7 +24,7 @@ SOFTWARE.
 */
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -149,7 +149,7 @@ public class XMLParserConfiguration {
      *      to use that value as the JSONObject key name to process as CDATA.
      * @param convertNilAttributeToNull <code>true</code> to parse values with attribute xsi:nil="true" as null.
      *                                  <code>false</code> to parse values with attribute xsi:nil="true" as {"xsi:nil":true}.
-     * @param xsiTypeMap  <code>new HashMap<String, XMLXsiTypeConverter<?>>()</code> to parse values with attribute
+     * @param xsiTypeMap  <code>new LinkedHashMap<String, XMLXsiTypeConverter<?>>()</code> to parse values with attribute
      *                   xsi:type="integer" as integer,  xsi:type="string" as string
      */
     private XMLParserConfiguration (final boolean keepStrings, final String cDataTagName,
@@ -273,13 +273,13 @@ public class XMLParserConfiguration {
      * will be converted to target type defined to client in this configuration
      * {@code Map<String, XMLXsiTypeConverter<?>>} to parse values with attribute
      * xsi:type="integer" as integer,  xsi:type="string" as string
-     * @param xsiTypeMap  {@code new HashMap<String, XMLXsiTypeConverter<?>>()} to parse values with attribute
+     * @param xsiTypeMap  {@code new LinkedHashMap<String, XMLXsiTypeConverter<?>>()} to parse values with attribute
      *                   xsi:type="integer" as integer,  xsi:type="string" as string
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
     public XMLParserConfiguration withXsiTypeMap(final Map<String, XMLXsiTypeConverter<?>> xsiTypeMap) {
         XMLParserConfiguration newConfig = this.clone();
-        Map<String, XMLXsiTypeConverter<?>> cloneXsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>(xsiTypeMap);
+        Map<String, XMLXsiTypeConverter<?>> cloneXsiTypeMap = new LinkedHashMap<String, XMLXsiTypeConverter<?>>(xsiTypeMap);
         newConfig.xsiTypeMap = Collections.unmodifiableMap(cloneXsiTypeMap);
         return newConfig;
     }

@@ -45,7 +45,7 @@ SOFTWARE.
  *
  * <b>Usage</b>
  * {@code
- *      Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+ *      Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new LinkedHashMap<String, XMLXsiTypeConverter<?>>();
  *      xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
  *          &#64;Override public String convert(final String value) {
  *              return value;

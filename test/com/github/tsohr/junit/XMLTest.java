@@ -38,8 +38,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import com.github.tsohr.JSONArray;
 import com.github.tsohr.JSONException;
@@ -48,9 +52,6 @@ import com.github.tsohr.JSONTokener;
 import com.github.tsohr.XML;
 import com.github.tsohr.XMLParserConfiguration;
 import com.github.tsohr.XMLXsiTypeConverter;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 
 /**
@@ -997,7 +998,7 @@ public class XMLTest {
                 + "<id2 xsi:type=\"integer\">1234</id2></root>";
         String expectedJsonString = "{\"root\":{\"id2\":1234,\"id1\":\"1234\"}}";
         JSONObject expectedJson = new JSONObject(expectedJsonString);
-        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new LinkedHashMap<String, XMLXsiTypeConverter<?>>();
         xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
             @Override public String convert(final String value) {
                 return value;
@@ -1018,7 +1019,7 @@ public class XMLTest {
                 + "xsi:type=\"integer\">54321</asInt></root>";
         String expectedJsonString = "{\"root\":{\"asString\":\"12345\",\"asInt\":54321}}";
         JSONObject expectedJson = new JSONObject(expectedJsonString);
-        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new LinkedHashMap<String, XMLXsiTypeConverter<?>>();
         xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
             @Override public String convert(final String value) {
                 return value;
@@ -1038,7 +1039,7 @@ public class XMLTest {
         String originalXml = "<root><asString xsi:type=\"string\">12345</asString><asInt>54321</asInt></root>";
         String expectedJsonString = "{\"root\":{\"asString\":\"12345\",\"asInt\":54321}}";
         JSONObject expectedJson = new JSONObject(expectedJsonString);
-        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new LinkedHashMap<String, XMLXsiTypeConverter<?>>();
         xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
             @Override public String convert(final String value) {
                 return value;
@@ -1050,7 +1051,7 @@ public class XMLTest {
 
     @Test
     public void testXSITypeMapNotModifiable() {
-        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new LinkedHashMap<String, XMLXsiTypeConverter<?>>();
         XMLParserConfiguration config = new XMLParserConfiguration().withXsiTypeMap(xsiTypeMap);
         xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
             @Override public String convert(final String value) {
