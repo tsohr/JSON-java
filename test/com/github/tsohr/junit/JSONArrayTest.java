@@ -43,10 +43,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONPointerException;
+import com.github.tsohr.JSONArray;
+import com.github.tsohr.JSONException;
+import com.github.tsohr.JSONObject;
+import com.github.tsohr.JSONPointerException;
 import org.junit.Test;
 
 import com.jayway.jsonpath.Configuration;
@@ -1267,6 +1267,6 @@ public class JSONArrayTest {
 		jsonArray.put(new JSONArray());
 		jsonArray.clear(); //Clears the JSONArray
 		assertTrue("expected jsonArray.length() == 0", jsonArray.length() == 0); //Check if its length is 0
-		jsonArray.getInt(0); //Should throws org.json.JSONException: JSONArray[0] not found
+		jsonArray.getInt(0); //Should throws com.github.tsohr.JSONException: JSONArray[0] not found
 	}
 }

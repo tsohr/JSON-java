@@ -3,11 +3,11 @@
  */
 package com.github.tsohr.junit.data;
 
-import org.json.JSONPropertyIgnore;
-import org.json.JSONPropertyName;
+import com.github.tsohr.JSONPropertyIgnore;
+import com.github.tsohr.JSONPropertyName;
 
 /**
- * Test bean to verify that the {@link org.json.JSONPropertyName} annotation
+ * Test bean to verify that the {@link com.github.tsohr.JSONPropertyName} annotation
  * is inherited.
  */
 public class MyBeanCustomNameSubClass extends MyBeanCustomName {

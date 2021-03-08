@@ -36,14 +36,14 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import com.github.tsohr.JSONArray;
+import com.github.tsohr.JSONException;
+import com.github.tsohr.JSONObject;
+import com.github.tsohr.JSONTokener;
 import org.junit.Test;
 
 /**
- * Test specific to the {@link org.json.JSONTokener} class.
+ * Test specific to the {@link com.github.tsohr.JSONTokener} class.
  * @author John Aylward
  *
  */

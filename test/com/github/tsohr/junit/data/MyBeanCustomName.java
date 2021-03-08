@@ -1,6 +1,6 @@
 package com.github.tsohr.junit.data;
 
-import org.json.JSONPropertyName;
+import com.github.tsohr.JSONPropertyName;
 
 /**
  * Test bean for the {@link JSONPropertyName} annotation.

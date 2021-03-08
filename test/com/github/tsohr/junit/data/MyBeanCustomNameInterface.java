@@ -1,7 +1,7 @@
 package com.github.tsohr.junit.data;
 
-import org.json.JSONPropertyIgnore;
-import org.json.JSONPropertyName;
+import com.github.tsohr.JSONPropertyIgnore;
+import com.github.tsohr.JSONPropertyName;
 
 public interface MyBeanCustomNameInterface {
     @JSONPropertyName("InterfaceField")

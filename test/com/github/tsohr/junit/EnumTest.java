@@ -32,11 +32,11 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.junit.data.MyEnum;
-import org.json.junit.data.MyEnumClass;
-import org.json.junit.data.MyEnumField;
+import com.github.tsohr.JSONArray;
+import com.github.tsohr.JSONObject;
+import com.github.tsohr.junit.data.MyEnum;
+import com.github.tsohr.junit.data.MyEnumClass;
+import com.github.tsohr.junit.data.MyEnumField;
 import org.junit.Test;
 
 import com.jayway.jsonpath.Configuration;
@@ -222,7 +222,7 @@ public class EnumTest {
          * However, an enum within another class will not be rendered
          * unless that class overrides default toString() 
          */
-        String expectedStr3 = "\"org.json.junit.data.MyEnumClass@";
+        String expectedStr3 = "\"com.github.tsohr.junit.data.MyEnumClass@";
         myEnumClass.setMyEnum(MyEnum.VAL1);
         myEnumClass.setMyEnumField(MyEnumField.VAL1);
         String str3 = JSONObject.valueToString(myEnumClass);

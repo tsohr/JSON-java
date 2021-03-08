@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -33,23 +34,30 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.XML;
-import org.json.XMLParserConfiguration;
+import com.github.tsohr.JSONArray;
+import com.github.tsohr.JSONException;
+import com.github.tsohr.JSONObject;
+import com.github.tsohr.JSONTokener;
+import com.github.tsohr.XML;
+import com.github.tsohr.XMLParserConfiguration;
+import com.github.tsohr.XMLXsiTypeConverter;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 
 /**
- * Tests for JSON-Java XML.java with XMLParserConfiguration.java
+ * Tests for JSON-Java XML.java
+ * Note: noSpace() will be tested by JSONMLTest
  */
-public class XMLConfigurationTest {
+public class XMLTest {
     /**
      * JUnit supports temporary files and folders that are cleaned up after the test.
      * https://garygregory.wordpress.com/2010/01/20/junit-tip-use-rules-to-manage-temporary-files-and-folders/ 
@@ -64,8 +72,7 @@ public class XMLConfigurationTest {
     @Test(expected=NullPointerException.class)
     public void shouldHandleNullXML() {
         String xmlStr = null;
-        JSONObject jsonObject = 
-                XML.toJSONObject(xmlStr, XMLParserConfiguration.KEEP_STRINGS);
+        JSONObject jsonObject = XML.toJSONObject(xmlStr);
         assertTrue("jsonObject should be empty", jsonObject.isEmpty());
     }
 
@@ -76,8 +83,7 @@ public class XMLConfigurationTest {
     public void shouldHandleEmptyXML() {
 
         String xmlStr = "";
-        JSONObject jsonObject = 
-                XML.toJSONObject(xmlStr, XMLParserConfiguration.KEEP_STRINGS);
+        JSONObject jsonObject = XML.toJSONObject(xmlStr);
         assertTrue("jsonObject should be empty", jsonObject.isEmpty());
     }
 
@@ -87,8 +93,7 @@ public class XMLConfigurationTest {
     @Test
     public void shouldHandleNonXML() {
         String xmlStr = "{ \"this is\": \"not xml\"}";
-        JSONObject jsonObject = 
-                XML.toJSONObject(xmlStr, XMLParserConfiguration.KEEP_STRINGS);
+        JSONObject jsonObject = XML.toJSONObject(xmlStr);
         assertTrue("xml string should be empty", jsonObject.isEmpty());
     }
 
@@ -108,7 +113,7 @@ public class XMLConfigurationTest {
             "   </address>\n"+
             "</addresses>";
         try {
-            XML.toJSONObject(xmlStr, XMLParserConfiguration.KEEP_STRINGS);
+            XML.toJSONObject(xmlStr);
             fail("Expecting a JSONException");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
@@ -133,7 +138,7 @@ public class XMLConfigurationTest {
             "   </address>\n"+
             "</addresses>";
         try {
-            XML.toJSONObject(xmlStr, XMLParserConfiguration.KEEP_STRINGS);
+            XML.toJSONObject(xmlStr);
             fail("Expecting a JSONException");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
@@ -158,7 +163,7 @@ public class XMLConfigurationTest {
             "   </address>\n"+
             "</addresses>";
         try {
-            XML.toJSONObject(xmlStr, XMLParserConfiguration.KEEP_STRINGS);
+            XML.toJSONObject(xmlStr);
             fail("Expecting a JSONException");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
@@ -183,7 +188,7 @@ public class XMLConfigurationTest {
             "   </address>\n"+
             "</addresses>";
         try {
-            XML.toJSONObject(xmlStr, XMLParserConfiguration.KEEP_STRINGS);
+            XML.toJSONObject(xmlStr);
             fail("Expecting a JSONException");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
@@ -208,9 +213,7 @@ public class XMLConfigurationTest {
             "   </address>\n"+
             "</addresses>";
         try {
-            XMLParserConfiguration config = 
-                    new XMLParserConfiguration().withcDataTagName("altContent");
-            XML.toJSONObject(xmlStr, config);
+            XML.toJSONObject(xmlStr);
             fail("Expecting a JSONException");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
@@ -225,8 +228,7 @@ public class XMLConfigurationTest {
     @Test
     public void shouldHandleNullJSONXML() {
         JSONObject jsonObject= null;
-        String actualXml = XML.toString(jsonObject, null,
-                XMLParserConfiguration.KEEP_STRINGS);
+        String actualXml=XML.toString(jsonObject);
         assertEquals("generated XML does not equal expected XML","\"null\"",actualXml);
     }
 
@@ -236,8 +238,7 @@ public class XMLConfigurationTest {
     @Test
     public void shouldHandleEmptyJSONXML() {
         JSONObject jsonObject= new JSONObject();
-        String xmlStr = XML.toString(jsonObject, null,
-                XMLParserConfiguration.KEEP_STRINGS);
+        String xmlStr = XML.toString(jsonObject);
         assertTrue("xml string should be empty", xmlStr.isEmpty());
     }
 
@@ -259,8 +260,7 @@ public class XMLConfigurationTest {
             "{\"addresses\":{\"address\":{\"name\":\"\",\"nocontent\":\"\",\""+
             "content\":\">\"},\"xsi:noNamespaceSchemaLocation\":\"test.xsd\",\""+
             "xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"}}";
-        JSONObject jsonObject = XML.toJSONObject(xmlStr,
-                XMLParserConfiguration.KEEP_STRINGS);
+        JSONObject jsonObject = XML.toJSONObject(xmlStr);
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
@@ -299,11 +299,66 @@ public class XMLConfigurationTest {
             "\"test.xsd\",\"xmlns:xsi\":\"http://www.w3.org/2001/"+
             "XMLSchema-instance\"}}";
 
-        XMLParserConfiguration config =
-                new XMLParserConfiguration().withcDataTagName("altContent");
-        compareStringToJSONObject(xmlStr, expectedStr, config);
-        compareReaderToJSONObject(xmlStr, expectedStr, config);
+        compareStringToJSONObject(xmlStr, expectedStr);
+        compareReaderToJSONObject(xmlStr, expectedStr);
         compareFileToJSONObject(xmlStr, expectedStr);
+    }
+
+    /**
+     * Tests to verify that supported escapes in XML are converted to actual values.
+     */
+    @Test
+    public void testXmlEscapeToJson(){
+        String xmlStr = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+            "<root>"+
+            "<rawQuote>\"</rawQuote>"+
+            "<euro>A &#8364;33</euro>"+
+            "<euroX>A &#x20ac;22&#x20AC;</euroX>"+
+            "<unknown>some text &copy;</unknown>"+
+            "<known>&#x0022; &quot; &amp; &apos; &lt; &gt;</known>"+
+            "<high>&#x1D122; &#x10165;</high>" +
+            "</root>";
+        String expectedStr = 
+            "{\"root\":{" +
+            "\"rawQuote\":\"\\\"\"," +
+            "\"euro\":\"A €33\"," +
+            "\"euroX\":\"A €22€\"," +
+            "\"unknown\":\"some text &copy;\"," +
+            "\"known\":\"\\\" \\\" & ' < >\"," +
+            "\"high\":\"𝄢 𐅥\""+
+            "}}";
+        
+        compareStringToJSONObject(xmlStr, expectedStr);
+        compareReaderToJSONObject(xmlStr, expectedStr);
+        compareFileToJSONObject(xmlStr, expectedStr);
+    }
+    
+    /**
+     * Tests that control characters are escaped.
+     */
+    @Test
+    public void testJsonToXmlEscape(){
+        final String jsonSrc = "{\"amount\":\"10,00 €\","
+                + "\"description\":\"Ação Válida\u0085\","
+                + "\"xmlEntities\":\"\\\" ' & < >\""
+                + "}";
+        JSONObject json = new JSONObject(jsonSrc);
+        String xml = XML.toString(json);
+        //test control character not existing
+        assertFalse("Escaping \u0085 failed. Found in XML output.", xml.contains("\u0085"));
+        assertTrue("Escaping \u0085 failed. Entity not found in XML output.", xml.contains("&#x85;"));
+        // test normal unicode existing
+        assertTrue("Escaping € failed. Not found in XML output.", xml.contains("€"));
+        assertTrue("Escaping ç failed. Not found in XML output.", xml.contains("ç"));
+        assertTrue("Escaping ã failed. Not found in XML output.", xml.contains("ã"));
+        assertTrue("Escaping á failed. Not found in XML output.", xml.contains("á"));
+        // test XML Entities converted
+        assertTrue("Escaping \" failed. Not found in XML output.", xml.contains("&quot;"));
+        assertTrue("Escaping ' failed. Not found in XML output.", xml.contains("&apos;"));
+        assertTrue("Escaping & failed. Not found in XML output.", xml.contains("&amp;"));
+        assertTrue("Escaping < failed. Not found in XML output.", xml.contains("&lt;"));
+        assertTrue("Escaping > failed. Not found in XML output.", xml.contains("&gt;"));
     }
 
     /**
@@ -324,11 +379,9 @@ public class XMLConfigurationTest {
                 "       <street>Baker street 5</street>\n"+
                 "   </address>\n"+
                 "</addresses>";
-        XMLParserConfiguration config =
-                new XMLParserConfiguration().withcDataTagName("altContent");
-        JSONObject jsonObject = XML.toJSONObject(xmlStr, config);
+        JSONObject jsonObject = XML.toJSONObject(xmlStr);
         String expectedStr = "{\"addresses\":{\"address\":{\"street\":\"Baker "+
-                "street 5\",\"name\":\"Joe Tester\",\"altContent\":\" this is -- "+
+                "street 5\",\"name\":\"Joe Tester\",\"content\":\" this is -- "+
                 "<another> comment \"}}}";
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
@@ -358,12 +411,9 @@ public class XMLConfigurationTest {
                 "\"test.xsd\",\"xmlns:xsi\":\"http://www.w3.org/2001/"+
                 "XMLSchema-instance\"}}";
         
-        JSONObject jsonObject = XML.toJSONObject(xmlStr,
-                XMLParserConfiguration.KEEP_STRINGS);
-        String xmlToStr = XML.toString(jsonObject, null,
-                XMLParserConfiguration.KEEP_STRINGS);
-        JSONObject finalJsonObject = XML.toJSONObject(xmlToStr,
-                XMLParserConfiguration.KEEP_STRINGS);
+        JSONObject jsonObject = XML.toJSONObject(xmlStr);
+        String xmlToStr = XML.toString(jsonObject);
+        JSONObject finalJsonObject = XML.toJSONObject(xmlToStr);
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
         Util.compareActualVsExpectedJsonObjects(finalJsonObject,expectedJsonObject);
@@ -375,14 +425,12 @@ public class XMLConfigurationTest {
      */
     @Test
     public void shouldHandleContentNoArraytoString() {
-        String expectedStr = 
-            "{\"addresses\":{\"altContent\":\">\"}}";
+        String expectedStr = "{\"addresses\":{\"content\":\">\"}}";
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
-        XMLParserConfiguration config = new XMLParserConfiguration().withcDataTagName("altContent");
-        String finalStr = XML.toString(expectedJsonObject, null, config);
+        String finalStr = XML.toString(expectedJsonObject);
         String expectedFinalStr = "<addresses>&gt;</addresses>";
-        assertTrue("Should handle expectedFinal: ["+expectedStr+"] final: ["+
-                finalStr+"]", expectedFinalStr.equals(finalStr));
+        assertEquals("Should handle expectedFinal: ["+expectedStr+"] final: ["+
+                finalStr+"]", expectedFinalStr, finalStr);
     }
 
     /**
@@ -393,15 +441,14 @@ public class XMLConfigurationTest {
     @Test
     public void shouldHandleContentArraytoString() {
         String expectedStr = 
-            "{\"addresses\":{\"altContent\":[1, 2, 3]}}";
+            "{\"addresses\":{" +
+            "\"content\":[1, 2, 3]}}";
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
-        XMLParserConfiguration config = new XMLParserConfiguration().withcDataTagName("altContent");
-        String finalStr = XML.toString(expectedJsonObject, null, config);
+        String finalStr = XML.toString(expectedJsonObject);
         String expectedFinalStr = "<addresses>"+
-                "1\n2\n3"+
-                "</addresses>";
-        assertTrue("Should handle expectedFinal: ["+expectedStr+"] final: ["+
-                finalStr+"]", expectedFinalStr.equals(finalStr));
+                "1\n2\n3</addresses>";
+        assertEquals("Should handle expectedFinal: ["+expectedStr+"] final: ["+
+                finalStr+"]", expectedFinalStr, finalStr);
     }
 
     /**
@@ -411,16 +458,15 @@ public class XMLConfigurationTest {
     @Test
     public void shouldHandleArraytoString() {
         String expectedStr = 
-                "{\"addresses\":{"+
-                        "\"something\":[1, 2, 3]}}";
+            "{\"addresses\":{"+
+            "\"something\":[1, 2, 3]}}";
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
-        String finalStr = XML.toString(expectedJsonObject, null,
-                XMLParserConfiguration.KEEP_STRINGS);
+        String finalStr = XML.toString(expectedJsonObject);
         String expectedFinalStr = "<addresses>"+
                 "<something>1</something><something>2</something><something>3</something>"+
                 "</addresses>";
-        assertTrue("Should handle expectedFinal: ["+expectedStr+"] final: ["+
-                finalStr+"]", expectedFinalStr.equals(finalStr));
+        assertEquals("Should handle expectedFinal: ["+expectedStr+"] final: ["+
+                finalStr+"]", expectedFinalStr, finalStr);
     }
     
     /**
@@ -434,11 +480,9 @@ public class XMLConfigurationTest {
         jo2.put("array",new JSONArray());
 
         final String expected = "<jo></jo>";
-        String output1 = XML.toString(jo1, "jo",
-                XMLParserConfiguration.KEEP_STRINGS);
+        String output1 = XML.toString(jo1,"jo");
         assertEquals("Expected an empty root tag", expected, output1);
-        String output2 = XML.toString(jo2, "jo",
-                XMLParserConfiguration.KEEP_STRINGS);
+        String output2 = XML.toString(jo2,"jo");
         assertEquals("Expected an empty root tag", expected, output2);
     }
     
@@ -453,12 +497,9 @@ public class XMLConfigurationTest {
         jo2.put("arr",new JSONArray(new Object[]{"One", new JSONArray(new String[]{}), "Four"}));
 
         final String expected = "<jo><arr>One</arr><arr></arr><arr>Four</arr></jo>";
-        String output1 = XML.toString(jo1, "jo",
-                XMLParserConfiguration.KEEP_STRINGS);
+        String output1 = XML.toString(jo1,"jo");
         assertEquals("Expected a matching array", expected, output1);
-        String output2 = XML.toString(jo2, "jo",
-                XMLParserConfiguration.KEEP_STRINGS);
-
+        String output2 = XML.toString(jo2,"jo");
         assertEquals("Expected a matching array", expected, output2);
     }
    
@@ -473,11 +514,9 @@ public class XMLConfigurationTest {
         jo2.put("arr",new JSONArray(new String[]{"One", "Two", "Three"}));
 
         final String expected = "<jo><arr>One</arr><arr>Two</arr><arr>Three</arr></jo>";
-        String output1 = XML.toString(jo1, "jo",
-                XMLParserConfiguration.KEEP_STRINGS);
+        String output1 = XML.toString(jo1,"jo");
         assertEquals("Expected a non empty root tag", expected, output1);
-        String output2 = XML.toString(jo2, "jo",
-                XMLParserConfiguration.KEEP_STRINGS);
+        String output2 = XML.toString(jo2,"jo");
         assertEquals("Expected a non empty root tag", expected, output2);
     }
 
@@ -492,11 +531,9 @@ public class XMLConfigurationTest {
         jo2.put("arr",new JSONArray(new Object[]{"One", new JSONArray(new String[]{"Two", "Three"}), "Four"}));
 
         final String expected = "<jo><arr>One</arr><arr><array>Two</array><array>Three</array></arr><arr>Four</arr></jo>";
-        String output1 = XML.toString(jo1, "jo",
-                XMLParserConfiguration.KEEP_STRINGS);
+        String output1 = XML.toString(jo1,"jo");
         assertEquals("Expected a matching array", expected, output1);
-        String output2 = XML.toString(jo2, "jo",
-                XMLParserConfiguration.KEEP_STRINGS);
+        String output2 = XML.toString(jo2,"jo");
         assertEquals("Expected a matching array", expected, output2);
     }
 
@@ -511,8 +548,7 @@ public class XMLConfigurationTest {
             "\"outer\":[[1], [2], [3]]},\"xsi:noNamespaceSchemaLocation\":\"test.xsd\",\""+
             "xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"}}";
         JSONObject jsonObject = new JSONObject(xmlStr);
-        String finalStr = XML.toString(jsonObject, null,
-                XMLParserConfiguration.ORIGINAL);
+        String finalStr = XML.toString(jsonObject);
         JSONObject finalJsonObject = XML.toJSONObject(finalStr);
         String expectedStr = "<addresses><address><name/><nocontent/>"+
                 "<outer><array>1</array></outer><outer><array>2</array>"+
@@ -520,8 +556,7 @@ public class XMLConfigurationTest {
                 "</address><xsi:noNamespaceSchemaLocation>test.xsd</xsi:noName"+
                 "spaceSchemaLocation><xmlns:xsi>http://www.w3.org/2001/XMLSche"+
                 "ma-instance</xmlns:xsi></addresses>";
-        JSONObject expectedJsonObject = XML.toJSONObject(expectedStr, 
-                XMLParserConfiguration.ORIGINAL);
+        JSONObject expectedJsonObject = XML.toJSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(finalJsonObject,expectedJsonObject);
     }
 
@@ -539,8 +574,7 @@ public class XMLConfigurationTest {
         inputJSON.append("123IllegalNode", "someValue1");
         inputJSON.append("Illegal@node", "someValue2");
 
-        String result = XML.toString(inputJSON, null,
-                XMLParserConfiguration.KEEP_STRINGS);
+        String result = XML.toString(inputJSON);
 
         /*
          * This is invalid XML. Names should not begin with digits or contain
@@ -550,9 +584,9 @@ public class XMLConfigurationTest {
          */
         String expected = "<123IllegalNode>someValue1</123IllegalNode><Illegal@node>someValue2</Illegal@node>";
 
-        assertEquals("Length", expected.length(), result.length());
-        assertTrue("123IllegalNode", result.contains("<123IllegalNode>someValue1</123IllegalNode>"));
-        assertTrue("Illegal@node", result.contains("<Illegal@node>someValue2</Illegal@node>"));
+        assertEquals("length",expected.length(), result.length());
+        assertTrue("123IllegalNode",result.contains("<123IllegalNode>someValue1</123IllegalNode>"));
+        assertTrue("Illegal@node",result.contains("<Illegal@node>someValue2</Illegal@node>"));
     }
 
     /**
@@ -570,8 +604,7 @@ public class XMLConfigurationTest {
          * the string, "null".
          */
         String actualXML = "<nullValue>null</nullValue>";
-        String resultXML = XML.toString(inputJSON, null,
-                XMLParserConfiguration.KEEP_STRINGS);
+        String resultXML = XML.toString(inputJSON);
         assertEquals(actualXML, resultXML);
     }
 
@@ -585,8 +618,7 @@ public class XMLConfigurationTest {
          * JSONObject, the contents are placed in a string value with key="content".
          */
         String xmlStr = "<tag1></tag1><![CDATA[if (a < b && a > 0) then return]]><tag2></tag2>";
-        JSONObject jsonObject = XML.toJSONObject(xmlStr, 
-                XMLParserConfiguration.KEEP_STRINGS);
+        JSONObject jsonObject = XML.toJSONObject(xmlStr);
         assertTrue("1. 3 items", 3 == jsonObject.length());
         assertTrue("1. empty tag1", "".equals(jsonObject.get("tag1")));
         assertTrue("1. empty tag2", "".equals(jsonObject.get("tag2")));
@@ -594,15 +626,12 @@ public class XMLConfigurationTest {
 
         // multiple consecutive standalone cdatas are accumulated into an array
         xmlStr = "<tag1></tag1><![CDATA[if (a < b && a > 0) then return]]><tag2></tag2><![CDATA[here is another cdata]]>";
-        jsonObject = XML.toJSONObject(xmlStr,
-                new XMLParserConfiguration()
-                        .withKeepStrings(true)
-                        .withcDataTagName("altContent"));
+        jsonObject = XML.toJSONObject(xmlStr);
         assertTrue("2. 3 items", 3 == jsonObject.length());
         assertTrue("2. empty tag1", "".equals(jsonObject.get("tag1")));
         assertTrue("2. empty tag2", "".equals(jsonObject.get("tag2")));
-        assertTrue("2. content array found", jsonObject.get("altContent") instanceof JSONArray);
-        JSONArray jsonArray = jsonObject.getJSONArray("altContent");
+        assertTrue("2. content array found", jsonObject.get("content") instanceof JSONArray);
+        JSONArray jsonArray = jsonObject.getJSONArray("content");
         assertTrue("2. array size", jsonArray.length() == 2);
         assertTrue("2. content array entry 0", "if (a < b && a > 0) then return".equals(jsonArray.get(0)));
         assertTrue("2. content array entry 1", "here is another cdata".equals(jsonArray.get(1)));
@@ -613,10 +642,7 @@ public class XMLConfigurationTest {
          * from the calling code. and the content element is discarded. 
          */
         xmlStr =  "<tag1>value 1</tag1>";
-        jsonObject = XML.toJSONObject(xmlStr,
-                new XMLParserConfiguration()
-                        .withKeepStrings(true)
-                        .withcDataTagName("altContent"));
+        jsonObject = XML.toJSONObject(xmlStr);
         assertTrue("3. 2 items", 1 == jsonObject.length());
         assertTrue("3. value tag1", "value 1".equals(jsonObject.get("tag1")));
 
@@ -626,10 +652,7 @@ public class XMLConfigurationTest {
          * saved in the context, and then the local JSONObject is discarded.
          */
         xmlStr =  "<tag1>value 1</tag1><tag1>2</tag1><tag1>true</tag1>";
-        jsonObject = XML.toJSONObject(xmlStr,
-                new XMLParserConfiguration()
-                        .withKeepStrings(true)
-                        .withcDataTagName("altContent"));
+        jsonObject = XML.toJSONObject(xmlStr);
         assertTrue("4. 1 item", 1 == jsonObject.length());
         assertTrue("4. content array found", jsonObject.get("tag1") instanceof JSONArray);
         jsonArray = jsonObject.getJSONArray("tag1");
@@ -644,19 +667,14 @@ public class XMLConfigurationTest {
          * accumulated to content. 
          */
         xmlStr =  "<tag1>val1<tag2/>val2</tag1>";
-        jsonObject = XML.toJSONObject(xmlStr,
-                new XMLParserConfiguration()
-                        .withKeepStrings(true)
-                        .withcDataTagName("altContent"));
+        jsonObject = XML.toJSONObject(xmlStr);
         assertTrue("5. 1 item", 1 == jsonObject.length());
-        assertTrue("5. jsonObject found", jsonObject.get("tag1") 
-                instanceof JSONObject);
+        assertTrue("5. jsonObject found", jsonObject.get("tag1") instanceof JSONObject);
         jsonObject = jsonObject.getJSONObject("tag1");
         assertTrue("5. 2 contained items", 2 == jsonObject.length());
         assertTrue("5. contained tag", "".equals(jsonObject.get("tag2")));
-        assertTrue("5. contained content jsonArray found",
-                jsonObject.get("altContent") instanceof JSONArray);
-        jsonArray = jsonObject.getJSONArray("altContent");
+        assertTrue("5. contained content jsonArray found", jsonObject.get("content") instanceof JSONArray);
+        jsonArray = jsonObject.getJSONArray("content");
         assertTrue("5. array size", jsonArray.length() == 2);
         assertTrue("5. content array entry 0", "val1".equals(jsonArray.get(0)));
         assertTrue("5. content array entry 1", "val2".equals(jsonArray.get(1)));
@@ -666,15 +684,11 @@ public class XMLConfigurationTest {
          * "content" field as a string.
          */
         xmlStr =  "<tag1>val1<tag2/></tag1>";
-        jsonObject = XML.toJSONObject(xmlStr,
-                new XMLParserConfiguration()
-                        .withKeepStrings(true)
-                        .withcDataTagName("altContent"));
+        jsonObject = XML.toJSONObject(xmlStr);
         assertTrue("6. 1 item", 1 == jsonObject.length());
         assertTrue("6. jsonObject found", jsonObject.get("tag1") instanceof JSONObject);
         jsonObject = jsonObject.getJSONObject("tag1");
-        assertTrue("6. contained content found", 
-                "val1".equals(jsonObject.get("altContent")));
+        assertTrue("6. contained content found", "val1".equals(jsonObject.get("content")));
         assertTrue("6. contained tag2", "".equals(jsonObject.get("tag2")));
 
         /*
@@ -682,18 +696,13 @@ public class XMLConfigurationTest {
          * We end up with an array within an array, and no content element.
          * This is probably a bug. 
          */
-        xmlStr =  "<tag1>val1<altContent/></tag1>";
-        jsonObject = XML.toJSONObject(xmlStr,
-                new XMLParserConfiguration()
-                        .withKeepStrings(true)
-                        .withcDataTagName("altContent"));
+        xmlStr =  "<tag1>val1<content/></tag1>";
+        jsonObject = XML.toJSONObject(xmlStr);
         assertTrue("7. 1 item", 1 == jsonObject.length());
-        assertTrue("7. jsonArray found", 
-                jsonObject.get("tag1") instanceof JSONArray);
+        assertTrue("7. jsonArray found", jsonObject.get("tag1") instanceof JSONArray);
         jsonArray = jsonObject.getJSONArray("tag1");
         assertTrue("array size 1", jsonArray.length() == 1);
-        assertTrue("7. contained array found", jsonArray.get(0) 
-                instanceof JSONArray);
+        assertTrue("7. contained array found", jsonArray.get(0) instanceof JSONArray);
         jsonArray = jsonArray.getJSONArray(0);
         assertTrue("7. inner array size 2", jsonArray.length() == 2);
         assertTrue("7. inner array item 0", "val1".equals(jsonArray.get(0)));
@@ -710,7 +719,7 @@ public class XMLConfigurationTest {
                                 "\"entries\": ["+
                                     "{"+
                                         "\"deviceId\": \"id\","+
-                                        "\"altContent\": {"+
+                                        "\"content\": {"+
                                             "\"material\": ["+
                                                 "{"+
                                                     "\"stuff\": false"+
@@ -724,10 +733,7 @@ public class XMLConfigurationTest {
                     "}"+
                 "}";
         jsonObject = new JSONObject(jsonStr);
-        xmlStr = XML.toString(jsonObject, null,
-                new XMLParserConfiguration()
-                        .withKeepStrings(true)
-                        .withcDataTagName("altContent"));
+        xmlStr = XML.toString(jsonObject);
         /*
          * This is the created XML. Looks like content was mistaken for
          * complex (child node + text) XML. 
@@ -746,177 +752,14 @@ public class XMLConfigurationTest {
     }
 
     /**
-     * JSON string lost leading zero and converted "True" to true.
-     */
-    @Test
-    public void testToJSONArray_jsonOutput() {
-        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
-        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",1,\"00\",0],\"title\":true}}");
-        final JSONObject actualJsonOutput = XML.toJSONObject(originalXml, 
-                new XMLParserConfiguration().withKeepStrings(false));
-        Util.compareActualVsExpectedJsonObjects(actualJsonOutput,expected);
-    }
-
-    /**
-     * JSON string cannot be reverted to original xml.
-     */
-    @Test
-    public void testToJSONArray_reversibility() {
-        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
-        XMLParserConfiguration config = new XMLParserConfiguration().withKeepStrings(false);
-        final String revertedXml = 
-                XML.toString(XML.toJSONObject(originalXml, config), 
-                        null, config);
-        assertNotEquals(revertedXml, originalXml);
-    }
-
-    /**
-     * test passes when using the new method toJsonArray.
-     */
-    @Test
-    public void testToJsonXML() {
-        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
-        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",\"1\",\"00\",\"0\"],\"title\":\"True\"}}");
-
-        final JSONObject json = XML.toJSONObject(originalXml,
-                new XMLParserConfiguration().withKeepStrings(true));
-        Util.compareActualVsExpectedJsonObjects(json, expected);
-        
-        final String reverseXml = XML.toString(json);
-        // this reversal isn't exactly the same. use JSONML for an exact reversal
-        final String expectedReverseXml = "<root><item><id>01</id></item><id>01</id><id>1</id><id>00</id><id>0</id><title>True</title></root>";
-
-        assertEquals("length",expectedReverseXml.length(), reverseXml.length());
-        assertTrue("array contents", reverseXml.contains("<id>01</id><id>1</id><id>00</id><id>0</id>"));
-        assertTrue("item contents", reverseXml.contains("<item><id>01</id></item>"));
-        assertTrue("title contents", reverseXml.contains("<title>True</title>"));
-    }
-    
-    /**
-     * test to validate certain conditions of XML unescaping.
-     */
-    @Test
-    public void testUnescape() {
-        assertEquals("{\"xml\":\"Can cope <;\"}",
-                XML.toJSONObject("<xml>Can cope &lt;; </xml>",
-                        XMLParserConfiguration.KEEP_STRINGS).toString());
-        assertEquals("Can cope <; ", XML.unescape("Can cope &lt;; "));
-
-        assertEquals("{\"xml\":\"Can cope & ;\"}",
-                XML.toJSONObject("<xml>Can cope &amp; ; </xml>",
-                        XMLParserConfiguration.KEEP_STRINGS).toString());
-        assertEquals("Can cope & ; ", XML.unescape("Can cope &amp; ; "));
-
-        assertEquals("{\"xml\":\"Can cope &;\"}",
-                XML.toJSONObject("<xml>Can cope &amp;; </xml>",
-                        XMLParserConfiguration.KEEP_STRINGS).toString());
-        assertEquals("Can cope &; ", XML.unescape("Can cope &amp;; "));
-
-        // unicode entity
-        assertEquals("{\"xml\":\"Can cope 4;\"}",
-                XML.toJSONObject("<xml>Can cope &#x34;; </xml>",
-                        XMLParserConfiguration.KEEP_STRINGS).toString());
-        assertEquals("Can cope 4; ", XML.unescape("Can cope &#x34;; "));
-
-        // double escaped
-        assertEquals("{\"xml\":\"Can cope &lt;\"}",
-                XML.toJSONObject("<xml>Can cope &amp;lt; </xml>",
-                        XMLParserConfiguration.KEEP_STRINGS).toString());
-        assertEquals("Can cope &lt; ", XML.unescape("Can cope &amp;lt; "));
-        
-        assertEquals("{\"xml\":\"Can cope &#x34;\"}",
-                XML.toJSONObject("<xml>Can cope &amp;#x34; </xml>",
-                        XMLParserConfiguration.KEEP_STRINGS).toString());
-        assertEquals("Can cope &#x34; ", XML.unescape("Can cope &amp;#x34; "));
-
-   }
-
-    /**
-     * Confirm XMLParserConfiguration functionality
-     */
-    @Test
-    public void testConfig() {
-        /**
-         * 1st param is whether to keep the raw string, or call
-         * XML.stringToValue(), which may convert the token to
-         * boolean, null, or number.
-         * 2nd param is what JSON name to use for strings that are
-         * evaluated as xml content data in complex objects, e.g. 
-         * <parent>
-         *      <child>value</child>
-         *      content data
-         * </tag>
-         */
-
-        String xmlStr = 
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
-                "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
-                "   xsi:noNamespaceSchemaLocation='test.xsd'>\n"+
-                "   <address>\n"+
-                "       content 1\n"+
-                "       <name>Sherlock Holmes</name>\n"+
-                "       content 2\n"+
-                "       <street>Baker street 5</street>\n"+
-                "       content 3\n"+
-                "       <num>1</num>\n"+
-                "   </address>\n"+
-                "</addresses>";
-
-        // keep strings, use the altContent tag
-        XMLParserConfiguration config = 
-                new XMLParserConfiguration()
-                        .withKeepStrings(true)
-                        .withcDataTagName("altContent");
-        JSONObject jsonObject = XML.toJSONObject(xmlStr, config);
-        // num is parsed as a string
-        assertEquals(jsonObject.getJSONObject("addresses").
-                getJSONObject("address").getString("num"), "1");
-        // complex content is collected in an 'altContent' array
-        JSONArray jsonArray = jsonObject.getJSONObject("addresses").
-                getJSONObject("address").getJSONArray("altContent");
-        String expectedStr = "[\"content 1\", \"content 2\", \"content 3\"]";
-        JSONArray expectedJsonArray = new JSONArray(expectedStr);
-        Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
-
-        // keepstrings only
-        jsonObject = XML.toJSONObject(xmlStr, 
-                XMLParserConfiguration.KEEP_STRINGS);
-        // num is parsed as a string
-        assertEquals(jsonObject.getJSONObject("addresses").
-                getJSONObject("address").getString("num"), "1");
-        // complex content is collected in an 'content' array
-        jsonArray = jsonObject.getJSONObject("addresses").
-                getJSONObject("address").getJSONArray("content");
-        expectedJsonArray = new JSONArray(expectedStr);
-        Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
-        
-        // use alternate content name
-        config = new XMLParserConfiguration().withcDataTagName("altContent");
-        jsonObject = XML.toJSONObject(xmlStr, config);
-        // num is parsed as a number
-        assertEquals(jsonObject.getJSONObject("addresses").
-                getJSONObject("address").getInt("num"), 1);
-        // complex content is collected in an 'altContent' array
-        jsonArray = jsonObject.getJSONObject("addresses").
-                getJSONObject("address").getJSONArray("altContent");
-        expectedJsonArray = new JSONArray(expectedStr);
-        Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
-
-    }
-    
-    
-    /**
      * Convenience method, given an input string and expected result,
      * convert to JSONObject and compare actual to expected result.
      * @param xmlStr the string to parse
      * @param expectedStr the expected JSON string
-     * @param config provides more flexible XML parsing
-     * flexible XML parsing.
      */
-    private void compareStringToJSONObject(String xmlStr, String expectedStr,
-            XMLParserConfiguration config) {
+    private void compareStringToJSONObject(String xmlStr, String expectedStr) {
+        JSONObject jsonObject = XML.toJSONObject(xmlStr);
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
-        JSONObject jsonObject = XML.toJSONObject(xmlStr, config);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 
@@ -925,26 +768,12 @@ public class XMLConfigurationTest {
      * convert to JSONObject via reader and compare actual to expected result.
      * @param xmlStr the string to parse
      * @param expectedStr the expected JSON string
-     * @param config provides more flexible XML parsing
      */
-    private void compareReaderToJSONObject(String xmlStr, String expectedStr,
-            XMLParserConfiguration config) {
-        /*
-         * Commenting out this method until the JSON-java code is updated
-         * to support XML.toJSONObject(reader)
-         */
+    private void compareReaderToJSONObject(String xmlStr, String expectedStr) {
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Reader reader = new StringReader(xmlStr);
-        try {
-            JSONObject jsonObject = XML.toJSONObject(reader, config);
-            Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
-        } catch (Exception e) {
-            assertTrue("Reader error: " +e.getMessage(), false);
-        } finally {
-            try {
-                reader.close();
-            } catch (Exception e) {}
-        }
+        JSONObject jsonObject = XML.toJSONObject(reader);
+        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 
     /**
@@ -958,10 +787,6 @@ public class XMLConfigurationTest {
      * @throws IOException
      */
     private void compareFileToJSONObject(String xmlStr, String expectedStr) {
-        /*
-         * Commenting out this method until the JSON-java code is updated
-         * to support XML.toJSONObject(reader)
-         */
         try {
             JSONObject expectedJsonObject = new JSONObject(expectedStr);
             File tempFile = this.testFolder.newFile("fileToJSONObject.xml");
@@ -980,7 +805,267 @@ public class XMLConfigurationTest {
                 reader.close();
             }
         } catch (IOException e) {
-            assertTrue("Error: " +e.getMessage(), false);
+            fail("Error: " +e.getMessage());
         }
+    }
+
+    /**
+     * JSON string lost leading zero and converted "True" to true.
+     */
+    @Test
+    public void testToJSONArray_jsonOutput() {
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
+        final JSONObject expectedJson = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",1,\"00\",0],\"title\":true}}");
+        final JSONObject actualJsonOutput = XML.toJSONObject(originalXml, false);
+
+        Util.compareActualVsExpectedJsonObjects(actualJsonOutput,expectedJson);
+    }
+
+    /**
+     * JSON string cannot be reverted to original xml.
+     */
+    @Test
+    public void testToJSONArray_reversibility() {
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
+        final String revertedXml = XML.toString(XML.toJSONObject(originalXml, false));
+
+        assertNotEquals(revertedXml, originalXml);
+    }
+
+    /**
+     * test passes when using the new method toJsonArray.
+     */
+    @Test
+    public void testToJsonXML() {
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
+        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",\"1\",\"00\",\"0\"],\"title\":\"True\"}}");
+
+        final JSONObject actual = XML.toJSONObject(originalXml,true);
+        
+        Util.compareActualVsExpectedJsonObjects(actual, expected);
+        
+        final String reverseXml = XML.toString(actual);
+        // this reversal isn't exactly the same. use JSONML for an exact reversal
+        // the order of the elements may be differnet as well.
+        final String expectedReverseXml = "<root><item><id>01</id></item><id>01</id><id>1</id><id>00</id><id>0</id><title>True</title></root>";
+
+        assertEquals("length",expectedReverseXml.length(), reverseXml.length());
+        assertTrue("array contents", reverseXml.contains("<id>01</id><id>1</id><id>00</id><id>0</id>"));
+        assertTrue("item contents", reverseXml.contains("<item><id>01</id></item>"));
+        assertTrue("title contents", reverseXml.contains("<title>True</title>"));
+    }
+    
+    /**
+     * test to validate certain conditions of XML unescaping.
+     */
+    @Test
+    public void testUnescape() {
+        assertEquals("{\"xml\":\"Can cope <;\"}",
+                XML.toJSONObject("<xml>Can cope &lt;; </xml>").toString());
+        assertEquals("Can cope <; ", XML.unescape("Can cope &lt;; "));
+
+        assertEquals("{\"xml\":\"Can cope & ;\"}",
+                XML.toJSONObject("<xml>Can cope &amp; ; </xml>").toString());
+        assertEquals("Can cope & ; ", XML.unescape("Can cope &amp; ; "));
+
+        assertEquals("{\"xml\":\"Can cope &;\"}",
+                XML.toJSONObject("<xml>Can cope &amp;; </xml>").toString());
+        assertEquals("Can cope &; ", XML.unescape("Can cope &amp;; "));
+
+        // unicode entity
+        assertEquals("{\"xml\":\"Can cope 4;\"}",
+                XML.toJSONObject("<xml>Can cope &#x34;; </xml>").toString());
+        assertEquals("Can cope 4; ", XML.unescape("Can cope &#x34;; "));
+
+        // double escaped
+        assertEquals("{\"xml\":\"Can cope &lt;\"}",
+                XML.toJSONObject("<xml>Can cope &amp;lt; </xml>").toString());
+        assertEquals("Can cope &lt; ", XML.unescape("Can cope &amp;lt; "));
+        
+        assertEquals("{\"xml\":\"Can cope &#x34;\"}",
+                XML.toJSONObject("<xml>Can cope &amp;#x34; </xml>").toString());
+        assertEquals("Can cope &#x34; ", XML.unescape("Can cope &amp;#x34; "));
+
+   }
+
+    /**
+     * test passes when xsi:nil="true" converting to null (JSON specification-like nil conversion enabled)
+     */
+    @Test
+    public void testToJsonWithNullWhenNilConversionEnabled() {
+        final String originalXml = "<root><id xsi:nil=\"true\"/></root>";
+        final String expectedJsonString = "{\"root\":{\"id\":null}}";
+
+        final JSONObject json = XML.toJSONObject(originalXml,
+                new XMLParserConfiguration()
+                    .withKeepStrings(false)
+                    .withcDataTagName("content")
+                    .withConvertNilAttributeToNull(true));
+        assertEquals(expectedJsonString, json.toString());
+    }
+
+    /**
+     * test passes when xsi:nil="true" not converting to null (JSON specification-like nil conversion disabled)
+     */
+    @Test
+    public void testToJsonWithNullWhenNilConversionDisabled() {
+        final String originalXml = "<root><id xsi:nil=\"true\"/></root>";
+        final String expectedJsonString = "{\"root\":{\"id\":{\"xsi:nil\":true}}}";
+
+        final JSONObject json = XML.toJSONObject(originalXml, new XMLParserConfiguration());
+        assertEquals(expectedJsonString, json.toString());
+    }
+
+    /**
+     * Tests to verify that supported escapes in XML are converted to actual values.
+     */
+    @Test
+    public void testIssue537CaseSensitiveHexEscapeMinimal(){
+        String xmlStr = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+            "<root>Neutrophils.Hypersegmented &#X7C; Bld-Ser-Plas</root>";
+        String expectedStr = 
+            "{\"root\":\"Neutrophils.Hypersegmented | Bld-Ser-Plas\"}";
+        JSONObject xmlJSONObj = XML.toJSONObject(xmlStr, true);
+        JSONObject expected = new JSONObject(expectedStr);
+        Util.compareActualVsExpectedJsonObjects(xmlJSONObj, expected);
+    }
+
+    /**
+     * Tests to verify that supported escapes in XML are converted to actual values.
+     */
+    @Test
+    public void testIssue537CaseSensitiveHexEscapeFullFile(){
+        try {
+            InputStream xmlStream = null;
+            try {
+                xmlStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue537.xml");
+                Reader xmlReader = new InputStreamReader(xmlStream);
+                JSONObject actual = XML.toJSONObject(xmlReader, true);
+                InputStream jsonStream = null;
+                try {
+                    jsonStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue537.json");
+                    final JSONObject expected = new JSONObject(new JSONTokener(jsonStream));
+                    Util.compareActualVsExpectedJsonObjects(actual,expected);
+                } finally {
+                    if (jsonStream != null) {
+                        jsonStream.close();
+                    }
+                }
+            } finally {
+                if (xmlStream != null) {
+                    xmlStream.close();
+                }
+            }
+        } catch (IOException e) {
+            fail("file writer error: " +e.getMessage());
+        }
+    }
+
+    /**
+     * Tests to verify that supported escapes in XML are converted to actual values.
+     */
+    @Test
+    public void testIssue537CaseSensitiveHexUnEscapeDirect(){
+        String origStr = 
+            "Neutrophils.Hypersegmented &#X7C; Bld-Ser-Plas";
+        String expectedStr = 
+            "Neutrophils.Hypersegmented | Bld-Ser-Plas";
+        String actualStr = XML.unescape(origStr);
+        
+        assertEquals("Case insensitive Entity unescape",  expectedStr, actualStr);
+    }
+
+    /**
+     * test passes when xsi:type="java.lang.String" not converting to string
+     */
+    @Test
+    public void testToJsonWithTypeWhenTypeConversionDisabled() {
+        String originalXml = "<root><id xsi:type=\"string\">1234</id></root>";
+        String expectedJsonString = "{\"root\":{\"id\":{\"xsi:type\":\"string\",\"content\":1234}}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration());
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
+    /**
+     * test passes when xsi:type="java.lang.String" converting to String
+     */
+    @Test
+    public void testToJsonWithTypeWhenTypeConversionEnabled() {
+        String originalXml = "<root><id1 xsi:type=\"string\">1234</id1>"
+                + "<id2 xsi:type=\"integer\">1234</id2></root>";
+        String expectedJsonString = "{\"root\":{\"id2\":1234,\"id1\":\"1234\"}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
+            @Override public String convert(final String value) {
+                return value;
+            }
+        });
+        xsiTypeMap.put("integer", new XMLXsiTypeConverter<Integer>() {
+            @Override public Integer convert(final String value) {
+                return Integer.valueOf(value);
+            }
+        });
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withXsiTypeMap(xsiTypeMap));
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
+    @Test
+    public void testToJsonWithXSITypeWhenTypeConversionEnabled() {
+        String originalXml = "<root><asString xsi:type=\"string\">12345</asString><asInt "
+                + "xsi:type=\"integer\">54321</asInt></root>";
+        String expectedJsonString = "{\"root\":{\"asString\":\"12345\",\"asInt\":54321}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
+            @Override public String convert(final String value) {
+                return value;
+            }
+        });
+        xsiTypeMap.put("integer", new XMLXsiTypeConverter<Integer>() {
+            @Override public Integer convert(final String value) {
+                return Integer.valueOf(value);
+            }
+        });
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withXsiTypeMap(xsiTypeMap));
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
+    @Test
+    public void testToJsonWithXSITypeWhenTypeConversionNotEnabledOnOne() {
+        String originalXml = "<root><asString xsi:type=\"string\">12345</asString><asInt>54321</asInt></root>";
+        String expectedJsonString = "{\"root\":{\"asString\":\"12345\",\"asInt\":54321}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
+            @Override public String convert(final String value) {
+                return value;
+            }
+        });
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withXsiTypeMap(xsiTypeMap));
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
+    @Test
+    public void testXSITypeMapNotModifiable() {
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        XMLParserConfiguration config = new XMLParserConfiguration().withXsiTypeMap(xsiTypeMap);
+        xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
+            @Override public String convert(final String value) {
+                return value;
+            }
+        });
+        assertEquals("Config Conversion Map size is expected to be 0", 0, config.getXsiTypeMap().size());
+
+        try {
+            config.getXsiTypeMap().put("boolean", new XMLXsiTypeConverter<Boolean>() {
+                @Override public Boolean convert(final String value) {
+                    return Boolean.valueOf(value);
+                }
+            });
+            fail("Expected to be unable to modify the config");
+        } catch (Exception ignored) { }
     }
 }

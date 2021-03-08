@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-import org.json.*;
+import com.github.tsohr.*;
 
 /**
  * These are helpful utility methods that perform basic comparisons

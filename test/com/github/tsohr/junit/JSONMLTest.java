@@ -26,11 +26,11 @@ SOFTWARE.
 
 import static org.junit.Assert.*;
 
-import org.json.*;
+import com.github.tsohr.*;
 import org.junit.Test;
 
 /**
- * Tests for org.json.JSONML.java
+ * Tests for com.github.tsohr.JSONML.java
  * 
  * Certain inputs are expected to result in exceptions. These tests are
  * executed first. JSONML provides an API to:

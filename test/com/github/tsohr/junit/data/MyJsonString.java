@@ -1,6 +1,6 @@
 package com.github.tsohr.junit.data;
 
-import org.json.*;
+import com.github.tsohr.*;
 
 /**
  * Used in testing when a JSONString is needed

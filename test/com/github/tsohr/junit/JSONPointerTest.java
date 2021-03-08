@@ -31,11 +31,11 @@ import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONPointer;
-import org.json.JSONPointerException;
-import org.json.JSONTokener;
+import com.github.tsohr.JSONArray;
+import com.github.tsohr.JSONObject;
+import com.github.tsohr.JSONPointer;
+import com.github.tsohr.JSONPointerException;
+import com.github.tsohr.JSONTokener;
 import org.junit.Test;
 
 public class JSONPointerTest {

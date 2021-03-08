@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
 import java.io.StringWriter;
 import java.util.*;
 
-import org.json.*;
+import com.github.tsohr.*;
 import org.junit.Test;
 
 /**

@@ -51,31 +51,31 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
-import org.json.CDL;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONPointerException;
-import org.json.JSONTokener;
-import org.json.XML;
-import org.json.junit.data.BrokenToString;
-import org.json.junit.data.ExceptionalBean;
-import org.json.junit.data.Fraction;
-import org.json.junit.data.GenericBean;
-import org.json.junit.data.GenericBeanInt;
-import org.json.junit.data.MyBean;
-import org.json.junit.data.MyBeanCustomName;
-import org.json.junit.data.MyBeanCustomNameSubClass;
-import org.json.junit.data.MyBigNumberBean;
-import org.json.junit.data.MyEnum;
-import org.json.junit.data.MyEnumField;
-import org.json.junit.data.MyJsonString;
-import org.json.junit.data.MyNumber;
-import org.json.junit.data.MyNumberContainer;
-import org.json.junit.data.MyPublicClass;
-import org.json.junit.data.Singleton;
-import org.json.junit.data.SingletonEnum;
-import org.json.junit.data.WeirdList;
+import com.github.tsohr.CDL;
+import com.github.tsohr.JSONArray;
+import com.github.tsohr.JSONException;
+import com.github.tsohr.JSONObject;
+import com.github.tsohr.JSONPointerException;
+import com.github.tsohr.JSONTokener;
+import com.github.tsohr.XML;
+import com.github.tsohr.junit.data.BrokenToString;
+import com.github.tsohr.junit.data.ExceptionalBean;
+import com.github.tsohr.junit.data.Fraction;
+import com.github.tsohr.junit.data.GenericBean;
+import com.github.tsohr.junit.data.GenericBeanInt;
+import com.github.tsohr.junit.data.MyBean;
+import com.github.tsohr.junit.data.MyBeanCustomName;
+import com.github.tsohr.junit.data.MyBeanCustomNameSubClass;
+import com.github.tsohr.junit.data.MyBigNumberBean;
+import com.github.tsohr.junit.data.MyEnum;
+import com.github.tsohr.junit.data.MyEnumField;
+import com.github.tsohr.junit.data.MyJsonString;
+import com.github.tsohr.junit.data.MyNumber;
+import com.github.tsohr.junit.data.MyNumberContainer;
+import com.github.tsohr.junit.data.MyPublicClass;
+import com.github.tsohr.junit.data.Singleton;
+import com.github.tsohr.junit.data.SingletonEnum;
+import com.github.tsohr.junit.data.WeirdList;
 import org.junit.Test;
 
 import com.jayway.jsonpath.Configuration;
@@ -720,7 +720,7 @@ public class JSONObjectTest {
     @Test
     public void jsonObjectByResourceBundle() {
         JSONObject jsonObject = new
-                JSONObject("org.json.junit.data.StringsResourceBundle",
+                JSONObject("com.github.tsohr.junit.data.StringsResourceBundle",
                         Locale.getDefault());
 
         // validate JSON
@@ -3228,6 +3228,6 @@ public class JSONObjectTest {
         jsonObject.put("key3", new JSONObject());
         jsonObject.clear(); //Clears the JSONObject
         assertTrue("expected jsonObject.length() == 0", jsonObject.length() == 0); //Check if its length is 0
-        jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
+        jsonObject.getInt("key1"); //Should throws com.github.tsohr.JSONException: JSONObject["asd"] not found
     }
 }

@@ -28,7 +28,7 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-import org.json.*;
+import com.github.tsohr.*;
 import org.junit.Test;
 
 

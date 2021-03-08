@@ -27,10 +27,10 @@ SOFTWARE.
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONArray;
-import org.json.CDL;
+import com.github.tsohr.JSONException;
+import com.github.tsohr.JSONObject;
+import com.github.tsohr.JSONArray;
+import com.github.tsohr.CDL;
 
 /**
  * Tests for CDL.java.
