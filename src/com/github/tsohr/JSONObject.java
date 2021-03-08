@@ -1132,6 +1132,33 @@ public class JSONObject {
             return defaultValue;
         }
     }
+    
+    /**
+     * Get an optional boolean associated with a key. It returns the
+     * defaultValue if there is no such key, or if it is not a Boolean or the
+     * String "true" or "false" (case insensitive).
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return The truth. including null
+     */
+    public Boolean optBooleanNullable(String key, Boolean defaultValue) {
+        Object val = this.opt(key);
+        if (NULL.equals(val)) {
+            return defaultValue;
+        }
+        if (val instanceof Boolean){
+            return ((Boolean) val).booleanValue();
+        }
+        try {
+            // we'll use the get anyway because it does string conversion.
+            return this.getBoolean(key);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
 
     /**
      * Get an optional BigDecimal associated with a key, or the defaultValue if
@@ -1280,6 +1307,29 @@ public class JSONObject {
         // }
         return doubleValue;
     }
+    
+    /**
+     * Get an optional double associated with a key, or the defaultValue if
+     * there is no such key or if its value is not a number. If the value is a
+     * string, an attempt will be made to evaluate it as a number.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return An object which is the value. including null
+     */
+    public Double optDoubleNullable(String key, Double defaultValue) {
+        Number val = this.optNumber(key);
+        if (val == null) {
+            return defaultValue;
+        }
+        final double doubleValue = val.doubleValue();
+        // if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue)) {
+        // return defaultValue;
+        // }
+        return doubleValue;
+    }
 
     /**
      * Get the optional double value associated with an index. NaN is returned
@@ -1318,6 +1368,29 @@ public class JSONObject {
     }
 
     /**
+     * Get the optional double value associated with an index. The defaultValue
+     * is returned if there is no value for the index, or if the value is not a
+     * number and cannot be converted to a number.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default value.
+     * @return The value. including null
+     */
+    public Float optFloatNullable(String key, Float defaultValue) {
+        Number val = this.optNumber(key);
+        if (val == null) {
+            return defaultValue;
+        }
+        final float floatValue = val.floatValue();
+        // if (Float.isNaN(floatValue) || Float.isInfinite(floatValue)) {
+        // return defaultValue;
+        // }
+        return floatValue;
+    }
+    
+    /**
      * Get an optional int value associated with a key, or zero if there is no
      * such key or if the value is not a number. If the value is a string, an
      * attempt will be made to evaluate it as a number.
@@ -1342,6 +1415,25 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public int optInt(String key, int defaultValue) {
+        final Number val = this.optNumber(key, null);
+        if (val == null) {
+            return defaultValue;
+        }
+        return val.intValue();
+    }
+    
+    /**
+     * Get an optional int value associated with a key, or the default if there
+     * is no such key or if the value is not a number. If the value is a string,
+     * an attempt will be made to evaluate it as a number.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return An object which is the value. including null
+     */
+    public Integer optIntNullable(String key, Integer defaultValue) {
         final Number val = this.optNumber(key, null);
         if (val == null) {
             return defaultValue;
@@ -1400,6 +1492,26 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public long optLong(String key, long defaultValue) {
+        final Number val = this.optNumber(key, null);
+        if (val == null) {
+            return defaultValue;
+        }
+
+        return val.longValue();
+    }
+    
+    /**
+     * Get an optional long value associated with a key, or the default if there
+     * is no such key or if the value is not a number. If the value is a string,
+     * an attempt will be made to evaluate it as a number.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return An object which is the value. including null
+     */
+    public Long optLongNullable(String key, Long defaultValue) {
         final Number val = this.optNumber(key, null);
         if (val == null) {
             return defaultValue;
